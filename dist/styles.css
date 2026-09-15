@@ -92,7 +92,7 @@ a { color: inherit; text-decoration: none; }
   position: absolute; top: -95px; right: 12%;
   width: 180px; height: 180px; border: 32px solid rgba(0,169,154,.06); border-radius: 50%;
 }
-.cover-watermark { position: absolute; inset: 0 0 auto auto; width: min(58vw, 850px); height: 100%; object-fit: cover; object-position: center; opacity: .075; filter: saturate(.8); -webkit-mask-image: linear-gradient(90deg, transparent, #000 32%); mask-image: linear-gradient(90deg, transparent, #000 32%); pointer-events: none; }
+.cover-watermark { position: absolute; inset: 0 0 auto auto; width: min(62vw, 900px); height: 100%; object-fit: cover; object-position: center; opacity: .17; filter: saturate(.9) contrast(1.04); -webkit-mask-image: linear-gradient(90deg, transparent, #000 27%); mask-image: linear-gradient(90deg, transparent, #000 27%); pointer-events: none; }
 .tool-hub-heading {
   position: relative;
   max-width: 1160px; margin: 0 auto 34px;
