@@ -16,8 +16,9 @@
       <span><strong>Học Nhẹ AI</strong><small>Người Trao Giải Pháp</small></span>
     </a>
     <nav aria-label="Điều hướng chính">
-      <a href="#tools">6 công cụ</a>
+      <a href="#tools">7 công cụ</a>
       <a href="#workspace">Tạo bài</a>
+      <a href="#stem">STEM</a>
       <a href="#progress">Tiến độ</a>
       <a href="#plan">Kế hoạch</a>
     </nav>
@@ -59,6 +60,10 @@
         <button class="tool-card plan-card" type="button" data-tool="plan">
           <span class="tool-icon" aria-hidden="true">🗓️</span><span class="tool-number">06</span>
           <strong>Kế hoạch 7 ngày</strong><small>Lập lịch 10–15 phút dựa trên kết quả.</small><b>Tạo kế hoạch →</b>
+        </button>
+        <button class="tool-card stem-card" type="button" data-tool="stem">
+          <span class="tool-icon" aria-hidden="true">🔬</span><span class="tool-number">07</span>
+          <strong>Khám phá STEM</strong><small>12 dự án tự làm an toàn cho học sinh lớp 2–5.</small><b>Mở phòng khám phá →</b>
         </button>
       </div>
       <section class="quick-zone" aria-labelledby="quick-title">
@@ -193,6 +198,56 @@
       </div>
     </section>
 
+    <section class="stem-section" id="stem">
+      <div class="stem-doodles" aria-hidden="true"><span>⚙️</span><span>🌱</span><span>🧪</span></div>
+      <div class="section-intro stem-intro">
+        <div>
+          <span class="eyebrow">CÔNG CỤ 07 · HỌC QUA TRẢI NGHIỆM</span>
+          <h2>Phòng khám phá STEM</h2>
+          <p>Chọn một nhiệm vụ, tự dự đoán, thử nghiệm và ghi lại điều em tìm thấy.</p>
+        </div>
+        <span class="stem-badge">12 dự án nguyên bản</span>
+      </div>
+
+      <div class="stem-controls" aria-label="Bộ lọc dự án STEM">
+        <label>Lớp
+          <select id="stemGrade"><option value="2">Lớp 2</option><option value="3">Lớp 3</option><option value="4">Lớp 4</option><option value="5">Lớp 5</option></select>
+        </label>
+        <label>Chủ đề
+          <select id="stemCategory"><option value="all">Tất cả</option><option value="science">Khoa học</option><option value="engineering">Kĩ thuật</option><option value="technology">Công nghệ</option><option value="environment">Môi trường</option></select>
+        </label>
+        <strong id="stemCount" aria-live="polite"></strong>
+      </div>
+      <div class="stem-project-grid" id="stemProjectGrid"></div>
+
+      <article class="stem-detail" id="stemDetail" hidden aria-live="polite">
+        <header class="stem-detail-header">
+          <span class="stem-detail-icon" id="stemDetailIcon" aria-hidden="true">🔬</span>
+          <div><span class="eyebrow">PHIẾU KHÁM PHÁ</span><h2 id="stemDetailTitle"></h2><p id="stemDetailMeta"></p></div>
+        </header>
+        <div class="stem-mission"><strong>🎯 Nhiệm vụ</strong><p id="stemMission"></p></div>
+        <div class="stem-columns">
+          <section><h3>Em sẽ học được</h3><ul id="stemGoals"></ul></section>
+          <section><h3>Chuẩn bị</h3><ul id="stemMaterials"></ul></section>
+        </div>
+        <section class="stem-steps"><h3>Các bước thực hiện</h3><ol id="stemSteps"></ol></section>
+        <section><h3>Bảng quan sát</h3><div class="stem-observe" id="stemObserve"></div></section>
+        <div class="stem-columns stem-thinking">
+          <section><h3>Vì sao lại như vậy?</h3><p id="stemExplain"></p></section>
+          <section><h3>Câu hỏi thử thách</h3><ol id="stemQuestions"></ol></section>
+        </div>
+        <aside class="stem-safety"><strong>🛡️ An toàn trước tiên</strong><p id="stemSafety"></p></aside>
+        <section class="stem-journal">
+          <h3>Nhật ký nhà khoa học nhỏ</h3>
+          <label>Dự đoán của em<textarea id="stemPrediction" rows="3" placeholder="Em nghĩ điều gì sẽ xảy ra?"></textarea></label>
+          <label>Điều em quan sát được<textarea id="stemResult" rows="3" placeholder="Kết quả thực tế là gì?"></textarea></label>
+          <label>Điều em rút ra<textarea id="stemConclusion" rows="3" placeholder="Em đã học được điều gì?"></textarea></label>
+          <label class="stem-complete"><input type="checkbox" id="stemComplete"> Em đã hoàn thành dự án này</label>
+        </section>
+        <div class="stem-actions"><button class="ghost" id="printStemBtn" type="button">In phiếu STEM</button><button class="primary" id="saveStemBtn" type="button">Lưu nhật ký trên máy</button><span id="stemSaveStatus" role="status"></span></div>
+      </article>
+    </section>
+
     <section class="coach-section" id="coachSection">
       <article class="coach-card explain-panel" id="explain">
         <div class="coach-heading">
@@ -309,6 +364,7 @@
 
   <noscript>Trang này cần JavaScript để tạo và chấm phiếu luyện.</noscript>
   <script src="data.js"></script>
+  <script src="stem-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
