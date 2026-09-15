@@ -630,3 +630,10 @@ dialog form > div { display: flex; justify-content: flex-end; gap: 9px; margin-t
   body.print-plan .plan-report { display: block !important; margin: 0; border: 0; }
   body.print-plan .plan-report-actions { display: none !important; }
 }
+
+
+/* Luồng chính: tạo bài → chấm bài → phân tích; phòng STEM nằm sau các công cụ học tập. */
+main { display: flex; flex-direction: column; }
+#stem { order: 20; }
+.coach-section { grid-template-columns: 1fr; }
+.analysis-panel { width: 100%; }
