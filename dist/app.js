@@ -18,6 +18,8 @@
     createPlanBtn: $("createPlanBtn"), planEmpty: $("planEmpty"), dayGrid: $("dayGrid"),
     planProgress: $("planProgress"), planProgressText: $("planProgressText"),
     planEncouragement: $("planEncouragement"), planProgressFill: $("planProgressFill"),
+    planReport: $("planReport"), planReportTitle: $("planReportTitle"), planReportStats: $("planReportStats"),
+    planComment: $("planComment"), printPlanBtn: $("printPlanBtn"), nextPlanBtn: $("nextPlanBtn"),
     achievementIcon: $("achievementIcon"), achievementTitle: $("achievementTitle"),
     achievementText: $("achievementText"), stemGrade: $("stemGrade"), stemCategory: $("stemCategory"),
     stemCount: $("stemCount"), stemProjectGrid: $("stemProjectGrid"), stemDetail: $("stemDetail"),
@@ -313,6 +315,7 @@
     saveResult(correct, currentQuestions.length, score, currentResults);
     renderAnalysis();
     renderHistory();
+    renderPlan();
     els.scoreBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
@@ -446,7 +449,7 @@
       { title: `Ngày 6 · Ôn tổng hợp lớp ${grade}`, detail: "10–15 phút · Hoàn thành đủ câu, không bỏ trống.", config: { grade, subject, topic: "all", level: "mixed", amount: shortAmount } },
       { title: `Ngày 7 · Kiểm tra tiến bộ`, detail: `15 phút · Làm mức thử thách và so sánh điểm với đầu tuần.`, config: { grade, subject, topic: focusTopic, level: "challenge", amount: shortAmount } }
     ].map((day, index) => ({ ...day, id: index + 1, done: false }));
-    state.plan = { createdAt: new Date().toISOString(), grade, focus, days };
+    state.plan = { createdAt: new Date().toISOString(), grade, focus, baselineScore: history[0]?.score ?? null, days };
     saveState(state);
     renderPlan();
   }
@@ -457,6 +460,7 @@
       els.planEmpty.hidden = false;
       els.dayGrid.hidden = true;
       els.planProgress.hidden = true;
+      els.planReport.hidden = true;
       return;
     }
     if (plan.days.some(day => !day.config)) {
@@ -494,6 +498,45 @@
       card.append(label, text, start);
       els.dayGrid.appendChild(card);
     });
+    renderPlanReport(plan);
+  }
+
+  function renderPlanReport(plan) {
+    const state = getState();
+    const completed = plan.days.filter(day => day.done).length;
+    const startedAt = new Date(plan.createdAt).getTime();
+    const sessions = (state.history || []).filter(item => new Date(item.date).getTime() >= startedAt);
+    const average = sessions.length ? Math.round(sessions.reduce((sum, item) => sum + item.score, 0) / sessions.length) : null;
+    const chronological = [...sessions].reverse();
+    const firstScore = chronological[0]?.score ?? plan.baselineScore;
+    const lastScore = chronological.at(-1)?.score ?? null;
+    const change = firstScore !== null && lastScore !== null ? lastScore - firstScore : null;
+    const topicGroups = {};
+    sessions.forEach(item => {
+      const key = `${item.subject === "math" ? "Toán" : "Tiếng Việt"} · ${item.topic}`;
+      topicGroups[key] ||= [];
+      topicGroups[key].push(item.score);
+    });
+    const ranked = Object.entries(topicGroups).map(([name, scores]) => ({ name, score: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) })).sort((a, b) => b.score - a.score);
+    const strongest = ranked[0];
+    const weakest = ranked.at(-1);
+    const habit = completed === 7 ? "rất đều đặn" : completed >= 5 ? "khá đều" : completed >= 3 ? "đang hình thành" : "cần được duy trì thêm";
+    const progress = change === null ? "Chưa đủ hai kết quả để đo mức thay đổi điểm." : change > 0 ? `Điểm gần nhất tăng ${change} điểm phần trăm so với mốc đầu.` : change < 0 ? `Điểm gần nhất thấp hơn mốc đầu ${Math.abs(change)} điểm phần trăm; nên ôn lại phần chưa chắc.` : "Điểm gần nhất đang giữ ổn định so với mốc đầu.";
+    const focus = weakest ? `Tuần tiếp theo nên ưu tiên ${weakest.name} (${weakest.score}%), xen kẽ một buổi ôn tổng hợp.` : `Hãy làm và chấm ít nhất hai bài trong tuần để hệ thống xác định chính xác phần cần ưu tiên.`;
+    els.planReportTitle.textContent = completed === 7 ? "Hoàn thành lộ trình 7 ngày" : "Nhận xét tiến độ hiện tại";
+    els.planReportStats.innerHTML = `
+      <div><strong>${completed}/7</strong><small>Ngày hoàn thành</small></div>
+      <div><strong>${sessions.length}</strong><small>Bài đã chấm</small></div>
+      <div><strong>${average === null ? "—" : average + "%"}</strong><small>Điểm trung bình</small></div>
+      <div><strong>${change === null ? "—" : (change > 0 ? "+" : "") + change + "%"}</strong><small>Thay đổi điểm</small></div>`;
+    els.planComment.innerHTML = `<p><strong>Nhận xét:</strong> Em đã hoàn thành ${completed}/7 ngày; thói quen học ${habit}. ${escapeText(progress)}</p><p><strong>Điểm mạnh:</strong> ${strongest ? `${escapeText(strongest.name)} đang có kết quả tốt nhất (${strongest.score}%).` : "Chưa đủ bài đã chấm để xác định."}</p><p><strong>Đề xuất:</strong> ${escapeText(focus)}</p>`;
+    els.planReport.hidden = false;
+  }
+
+  function printPlanReport() {
+    document.body.classList.add("print-plan");
+    window.print();
+    setTimeout(() => document.body.classList.remove("print-plan"), 1000);
   }
 
   function stemCategoryName(category) {
@@ -651,6 +694,8 @@
   els.answerBtn.addEventListener("click", toggleAnswers);
   els.explainBtn.addEventListener("click", renderExplanation);
   els.createPlanBtn.addEventListener("click", buildSevenDayPlan);
+  els.nextPlanBtn.addEventListener("click", buildSevenDayPlan);
+  els.printPlanBtn.addEventListener("click", printPlanReport);
   els.stemGrade.addEventListener("change", renderStemProjects);
   els.stemCategory.addEventListener("change", renderStemProjects);
   els.stemProjectGrid.addEventListener("click", event => {
@@ -659,7 +704,7 @@
   });
   els.saveStemBtn.addEventListener("click", saveStemJournal);
   els.printStemBtn.addEventListener("click", printStemProject);
-  window.addEventListener("afterprint", () => document.body.classList.remove("print-stem"));
+  window.addEventListener("afterprint", () => document.body.classList.remove("print-stem", "print-plan"));
   els.dayGrid.addEventListener("change", event => {
     const input = event.target.closest("input[data-day]");
     if (!input) return;
