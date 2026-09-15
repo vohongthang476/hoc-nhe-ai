@@ -34,6 +34,7 @@
   };
 
   const STORE_KEY = "hocnhe-v1";
+  const ZALO_URL = ""; // Bổ sung liên kết Zalo cá nhân trước khi nhận đăng ký.
   let currentQuestions = [];
   let currentConfig = null;
   let currentResults = [];
@@ -41,6 +42,25 @@
   let planPracticeQuestions = [];
   let planPracticeConfig = null;
   let activePlanDay = null;
+
+  const navToggle = $("navToggle");
+  const mainNav = $("mainNav");
+  navToggle.addEventListener("click", () => {
+    const open = mainNav.classList.toggle("open");
+    navToggle.setAttribute("aria-expanded", String(open));
+    navToggle.textContent = open ? "✕" : "☰";
+  });
+  mainNav.addEventListener("click", event => {
+    if (!event.target.closest("a")) return;
+    mainNav.classList.remove("open"); navToggle.setAttribute("aria-expanded", "false"); navToggle.textContent = "☰";
+  });
+  $("zaloRegisterBtn").addEventListener("click", () => {
+    if (ZALO_URL) window.open(ZALO_URL, "_blank", "noopener");
+    else alert("Chủ website chưa bổ sung liên kết Zalo. Vui lòng liên hệ Người Trao Giải Pháp.");
+  });
+  const backToTop = $("backToTop");
+  window.addEventListener("scroll", () => backToTop.classList.toggle("show", window.scrollY > 700), { passive: true });
+  backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 
   function getState() {
     try {
