@@ -22,11 +22,21 @@ Người duyệt: tối thiểu 2 giáo viên tiểu học đang giảng dạy; 
 - [ ] Xác nhận nút xóa dữ liệu thực sự xóa lịch sử cục bộ.
 - [ ] Ghi mã phiên bản nội dung và nhật ký sửa lỗi.
 
+## Kiểm tra 12 dự án STEM
+
+- [ ] Hai giáo viên thực hiện thử từng dự án và ghi lại thời lượng, kết quả thực tế.
+- [ ] Mục tiêu và phần giải thích phù hợp lứa tuổi của từng lớp.
+- [ ] Vật liệu dễ tìm, không yêu cầu điện lưới, lửa hoặc hóa chất nguy hiểm.
+- [ ] Mọi thao tác cắt, đục, ghim đều ghi rõ cần người lớn thực hiện.
+- [ ] Cảnh báo “không được uống” xuất hiện rõ ở dự án lọc nước.
+- [ ] Phiếu STEM in A4 không mất bước, câu hỏi hoặc cảnh báo an toàn.
+- [ ] Không dùng lại văn bản, hình ảnh hoặc bố cục từ học liệu của bên thứ ba.
+
 ## Biên bản duyệt
 
 | Phiên bản | Môn/lớp | Người duyệt 1 | Người duyệt 2 | Ngày | Kết luận |
 |---|---|---|---|---|---|
-| 1.0 | Toán & Tiếng Việt 2–5 | Chưa duyệt | Chưa duyệt | — | Chưa được phép quảng cáo là “đã kiểm định” |
+| 1.1 | Toán, Tiếng Việt & STEM 2–5 | Chưa duyệt | Chưa duyệt | — | Chưa được phép quảng cáo là “đã kiểm định” |
 
 ## Nguyên tắc xuất bản
 
