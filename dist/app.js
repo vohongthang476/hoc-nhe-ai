@@ -188,7 +188,13 @@
       answerLi.innerHTML = `<strong>${escapeText(q.answer)}</strong> — ${escapeText(q.explanation)}`;
       els.answerList.appendChild(answerLi);
     });
-    els.explainQuestion.replaceChildren(...currentQuestions.map((q, index) => {
+    populateExplainQuestions(currentQuestions.map((_, index) => index));
+  }
+
+  function populateExplainQuestions(indices) {
+    const available = indices.length ? indices : currentQuestions.map((_, index) => index);
+    els.explainQuestion.replaceChildren(...available.map(index => {
+      const q = currentQuestions[index];
       const option = document.createElement("option");
       option.value = index;
       option.textContent = `Câu ${index + 1}: ${plainText(q.prompt).slice(0, 62)}${plainText(q.prompt).length > 62 ? "…" : ""}`;
@@ -207,9 +213,15 @@
       amount: Number(els.amount.value),
       student: els.studentName.value.trim()
     };
+    const state = getState();
+    state.questionMemory = state.questionMemory || {};
+    const memoryKey = [currentConfig.subject, currentConfig.grade, currentConfig.topic, currentConfig.level].join("|");
+    const usedQuestions = state.questionMemory[memoryKey] || [];
     currentQuestions = window.HOCNHE.generate(
-      currentConfig.subject, currentConfig.grade, currentConfig.topic, currentConfig.level, currentConfig.amount
+      currentConfig.subject, currentConfig.grade, currentConfig.topic, currentConfig.level, currentConfig.amount, usedQuestions
     );
+    const newKeys = currentQuestions.map(q => q.prompt + "|" + q.answer);
+    state.questionMemory[memoryKey] = [...newKeys, ...usedQuestions.filter(key => !newKeys.includes(key))].slice(0, 120);
     const subjectLabel = currentConfig.subject === "math" ? "Toán" : "Tiếng Việt";
     const selectedTopic = topicName(currentConfig.subject, currentConfig.grade, currentConfig.topic);
     const levelLabel = { basic: "Cơ bản", mixed: "Vừa sức", challenge: "Thử thách" }[currentConfig.level];
@@ -228,7 +240,6 @@
     els.scoreBox.textContent = "";
     els.paperSection.hidden = false;
 
-    const state = getState();
     state.preferences = { ...currentConfig };
     saveState(state);
     if (scrollToPaper) els.paperSection.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -317,7 +328,7 @@
     renderAnalysis();
     renderHistory();
     renderPlan();
-    els.scoreBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    els.analysisOutput.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function saveResult(correct, total, score, results) {
@@ -381,7 +392,7 @@
 
   function resetCoachPanels() {
     els.explainOutput.className = "explain-output empty-panel";
-    els.explainOutput.innerHTML = '<span aria-hidden="true">?</span><p>Chọn một câu để xem cách làm từng bước.</p>';
+    els.explainOutput.innerHTML = '<span aria-hidden="true">?</span><p>Chấm bài để ưu tiên giải thích những câu làm sai.</p>';
     els.analysisOutput.className = "analysis-output empty-panel";
     els.analysisOutput.innerHTML = '<span aria-hidden="true">◎</span><p>Chấm phiếu này để xem phân tích.</p>';
   }
@@ -406,6 +417,7 @@
     const unanswered = currentResults.filter(item => item.unanswered).length;
     const incorrect = currentResults.length - correct - unanswered;
     const wrongItems = currentResults.filter(item => !item.isCorrect);
+    populateExplainQuestions(wrongItems.map(item => item.index));
     const subjectLabel = currentConfig.subject === "math" ? "Toán" : "Tiếng Việt";
     const focus = topicName(currentConfig.subject, currentConfig.grade, currentConfig.topic);
     const list = wrongItems.length
@@ -415,7 +427,7 @@
         }).join("")}</ol>`
       : "<p><strong>Rất tốt!</strong> Chưa phát hiện câu sai trong lần làm này.</p>";
     const advice = wrongItems.length
-      ? `Nên luyện lại ${focus} trong 10 phút, xem giải thích các câu ${wrongItems.map(item => item.index + 1).join(", ")} rồi tạo một bộ mới.`
+      ? `Nên luyện lại ${focus} trong 10 phút, xem phần giải thích bên dưới cho các câu ${wrongItems.map(item => item.index + 1).join(", ")} rồi tạo một bộ mới.`
       : `Có thể chuyển sang mức cao hơn hoặc chọn chủ đề khác của ${subjectLabel} lớp ${currentConfig.grade}.`;
     els.analysisOutput.className = "analysis-output empty-panel has-content";
     els.analysisOutput.innerHTML = `
