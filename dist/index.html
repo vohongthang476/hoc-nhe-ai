@@ -52,13 +52,13 @@
           <span class="tool-icon" aria-hidden="true">✍️</span><span class="tool-number">03</span>
           <strong>Làm bài trực tuyến</strong><small>Làm ngay, chấm điểm và lưu kết quả.</small><b>Bắt đầu làm →</b>
         </button>
-        <button class="tool-card explain-card" type="button" data-tool="explain">
-          <span class="tool-icon" aria-hidden="true">💡</span><span class="tool-number">04</span>
-          <strong>Giải thích từng bước</strong><small>Chọn một câu và xem cách làm rõ ràng.</small><b>Xem hướng dẫn →</b>
-        </button>
         <button class="tool-card analysis-card" type="button" data-tool="analysis">
-          <span class="tool-icon" aria-hidden="true">🎯</span><span class="tool-number">05</span>
+          <span class="tool-icon" aria-hidden="true">🎯</span><span class="tool-number">04</span>
           <strong>Phân tích lỗi sai</strong><small>Biết câu nào sai và phần nào cần luyện lại.</small><b>Xem phân tích →</b>
+        </button>
+        <button class="tool-card explain-card" type="button" data-tool="explain">
+          <span class="tool-icon" aria-hidden="true">💡</span><span class="tool-number">05</span>
+          <strong>Giải thích từng bước</strong><small>Ưu tiên giải thích những câu vừa làm sai.</small><b>Xem hướng dẫn →</b>
         </button>
         <button class="tool-card plan-card" type="button" data-tool="plan">
           <span class="tool-icon" aria-hidden="true">🗓️</span><span class="tool-number">06</span>
@@ -262,14 +262,24 @@
     </section>
 
     <section class="coach-section" id="coachSection">
-      <article class="coach-card explain-panel" id="explain">
+      <article class="coach-card analysis-panel" id="analysis">
         <div class="coach-heading">
           <span class="coach-icon">04</span>
-          <div><span class="eyebrow">GỢI Ý HỌC TẬP</span><h2>Giải thích từng bước</h2></div>
+          <div><span class="eyebrow">SAU KHI CHẤM BÀI</span><h2>Phân tích lỗi sai</h2></div>
         </div>
-        <p>Hãy tạo một phiếu, sau đó chọn câu cần xem. Công cụ sẽ chỉ ra dữ kiện, cách suy nghĩ và đáp án.</p>
+        <p>Không chỉ báo điểm: công cụ tổng hợp câu sai, câu bỏ trống và đề xuất phần cần luyện tiếp.</p>
+        <div class="analysis-output empty-panel" id="analysisOutput">
+          <span aria-hidden="true">◎</span><p>Chấm một phiếu để xem phân tích.</p>
+        </div>
+      </article>
+      <article class="coach-card explain-panel" id="explain">
+        <div class="coach-heading">
+          <span class="coach-icon">05</span>
+          <div><span class="eyebrow">SAU PHÂN TÍCH LỖI SAI</span><h2>Giải thích từng bước</h2></div>
+        </div>
+        <p>Sau khi chấm bài, công cụ ưu tiên các câu sai để học sinh xem lại cách làm.</p>
         <div class="coach-controls">
-          <label>Chọn câu
+          <label>Chọn câu cần xem
             <select id="explainQuestion"><option value="">Chưa có phiếu luyện</option></select>
           </label>
           <button class="primary" id="explainBtn" type="button" disabled>Giải thích câu này</button>
@@ -279,16 +289,6 @@
         </div>
       </article>
 
-      <article class="coach-card analysis-panel" id="analysis">
-        <div class="coach-heading">
-          <span class="coach-icon">05</span>
-          <div><span class="eyebrow">SAU KHI CHẤM BÀI</span><h2>Phân tích lỗi sai</h2></div>
-        </div>
-        <p>Không chỉ báo điểm: công cụ tổng hợp câu sai, câu bỏ trống và đề xuất phần cần luyện tiếp.</p>
-        <div class="analysis-output empty-panel" id="analysisOutput">
-          <span aria-hidden="true">◎</span><p>Chấm một phiếu để xem phân tích.</p>
-        </div>
-      </article>
     </section>
 
     <section class="plan-section" id="plan">
