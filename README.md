@@ -11,6 +11,7 @@ Công cụ tạo phiếu luyện Toán và Tiếng Việt lớp 2–5 cho phụ 
 - Công cụ 04: chọn từng câu để xem cách làm theo ba bước.
 - Công cụ 05: phân tích câu sai, câu bỏ trống và đề xuất phần cần luyện.
 - Công cụ 06: tạo kế hoạch 7 ngày theo kết quả yếu nhất, theo dõi tiến độ và mở đúng bài luyện cho từng ngày.
+- Công cụ 07: 12 dự án STEM tự biên soạn cho lớp 2–5; lọc theo chủ đề, hướng dẫn an toàn, nhật ký quan sát, lưu hoàn thành và in phiếu A4.
 - Góc học nhanh: thử thách 5 phút, luyện lại điểm yếu và xem thành tích/huy hiệu học tập.
 - Giao diện học sinh sinh động với biểu tượng môn học, thẻ màu và họa tiết trường học.
 - In A4 hoặc lưu PDF bằng chức năng in của trình duyệt.
@@ -34,6 +35,7 @@ Mở `dist/index.html` bằng trình duyệt. Không cần cài đặt.
 - `dist/index.html`: giao diện chính.
 - `dist/styles.css`: hiển thị responsive và bản in A4.
 - `dist/data.js`: danh mục, ngân hàng câu hỏi và thuật toán sinh bài.
+- `dist/stem-data.js`: 12 dự án STEM nguyên bản và quy tắc an toàn.
 - `dist/app.js`: tạo bài, chấm bài, đáp án, in và lưu cục bộ.
 - `dist/phuong-phap.html`: phạm vi, nguồn và cách kiểm soát nội dung.
 - `dist/quyen-rieng-tu.html`, `dist/dieu-khoan.html`: chính sách V1.
@@ -53,6 +55,6 @@ Nguồn tham chiếu:
 
 ## Trước khi mở bán
 
-Không mở bán chỉ dựa trên bản V1. Cần: giáo viên kiểm duyệt học liệu, backend đăng nhập, cơ sở dữ liệu, phân quyền thành viên, hosting thương mại, điều khoản bán hàng/hoàn tiền và quy trình bảo vệ dữ liệu trẻ em.
+Không mở bán chỉ dựa trên bản V1. Cần: giáo viên kiểm duyệt học liệu và thử nghiệm toàn bộ dự án STEM, backend đăng nhập, cơ sở dữ liệu, phân quyền thành viên, hosting thương mại, điều khoản bán hàng/hoàn tiền và quy trình bảo vệ dữ liệu trẻ em.
 
 © 2026 Người Trao Giải Pháp. All rights reserved.
