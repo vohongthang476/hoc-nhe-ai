@@ -333,18 +333,31 @@
     return choiceQ(item[0], item[1], item[2], item[3]);
   }
 
-  function generate(subject, grade, topic, level, count) {
+  function generate(subject, grade, topic, level, count, excludedKeys) {
     const items = [];
     const seen = new Set();
+    const excluded = new Set(excludedKeys || []);
+    const reserve = [];
     let safety = 0;
-    while (items.length < count && safety < count * 25) {
+    while (items.length < count && safety < count * 80) {
       const q = subject === "math" ? mathQuestion(grade, topic, level) : vietnameseQuestion(grade, topic);
       const key = q.prompt + "|" + q.answer;
-      if (!seen.has(key) || safety > count * 12) {
+      if (!seen.has(key) && !excluded.has(key)) {
         seen.add(key);
         items.push(q);
+      } else if (!seen.has(key) && !reserve.some(item => item.key === key)) {
+        reserve.push({ key, q });
       }
       safety++;
+    }
+    // Chỉ quay lại câu cũ khi ngân hàng của chủ đề hiện tại không còn đủ câu mới.
+    while (items.length < count && reserve.length) {
+      const index = Math.floor(Math.random() * reserve.length);
+      const item = reserve.splice(index, 1)[0];
+      if (!seen.has(item.key)) {
+        seen.add(item.key);
+        items.push(item.q);
+      }
     }
     return items;
   }
