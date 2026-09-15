@@ -450,6 +450,19 @@ select:focus, input:focus, button:focus-visible { outline: 3px solid rgba(20,156
 .day-card small { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .day-card.done { opacity: .68; background: #e7f6ef; }
 .day-card.done strong { text-decoration: line-through; }
+.plan-practice { grid-column: 1 / -1; margin-top: 14px; padding: 22px; background: white; color: var(--ink); border: 2px solid #8ad8ce; border-radius: 18px; box-shadow: 0 16px 40px rgba(16,42,99,.12); }
+.plan-practice header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); }
+.plan-practice header small { color: var(--teal); font-weight: 900; letter-spacing: .08em; }
+.plan-practice h3 { margin: 3px 0; color: var(--navy); font-family: var(--display-font); font-size: 25px; }
+.plan-practice header p { margin-top: 3px; color: var(--muted); }
+.plan-question-list { padding-left: 24px; }
+.plan-question-list > li { margin: 14px 0; padding: 14px; background: #f8fbff; border-radius: 12px; }
+.plan-question-list > li.correct { background: #e9f8ef; }
+.plan-question-list > li.incorrect { background: #fff0f0; }
+.plan-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.plan-choices label { display: flex; gap: 8px; padding: 9px; background: white; border: 1px solid var(--line); border-radius: 9px; }
+.plan-practice-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.plan-score { margin-bottom: 12px; padding: 12px; color: var(--navy); background: #fff5cc; border-radius: 10px; text-align: center; }
 .day-check { display: flex; align-items: flex-start; }
 .day-start-button { grid-column: 2; justify-self: start; padding: 6px 10px; color: white; background: var(--blue); border: 0; border-radius: 8px; font-size: 12px; font-weight: 800; }
 .day-start-button:hover { background: var(--navy); }
@@ -590,6 +603,9 @@ dialog form > div { display: flex; justify-content: flex-end; gap: 9px; margin-t
   .plan-workspace { padding: 12px; }
   .plan-progress > div:first-child { align-items: flex-start; flex-direction: column; gap: 2px; }
   .day-grid { grid-template-columns: 1fr; }
+  .plan-practice { padding: 16px; }
+  .plan-choices { grid-template-columns: 1fr; }
+  .plan-practice-actions button { width: 100%; }
   .plan-report-stats { grid-template-columns: 1fr 1fr; }
   .plan-report-actions button { width: 100%; }
   .day-card:last-child { grid-column: auto; }
