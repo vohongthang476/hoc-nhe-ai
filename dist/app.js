@@ -20,6 +20,7 @@
     planEncouragement: $("planEncouragement"), planProgressFill: $("planProgressFill"),
     planReport: $("planReport"), planReportTitle: $("planReportTitle"), planReportStats: $("planReportStats"),
     planComment: $("planComment"), printPlanBtn: $("printPlanBtn"), nextPlanBtn: $("nextPlanBtn"),
+    planPractice: $("planPractice"),
     achievementIcon: $("achievementIcon"), achievementTitle: $("achievementTitle"),
     achievementText: $("achievementText"), stemGrade: $("stemGrade"), stemCategory: $("stemCategory"),
     stemCount: $("stemCount"), stemProjectGrid: $("stemProjectGrid"), stemDetail: $("stemDetail"),
@@ -37,6 +38,9 @@
   let currentConfig = null;
   let currentResults = [];
   let currentStemId = null;
+  let planPracticeQuestions = [];
+  let planPracticeConfig = null;
+  let activePlanDay = null;
 
   function getState() {
     try {
@@ -514,6 +518,18 @@
     renderPlanReport(plan);
   }
 
+  function generateWithMemory(config) {
+    const state = getState();
+    state.questionMemory = state.questionMemory || {};
+    const memoryKey = [config.subject, config.grade, config.topic, config.level].join("|");
+    const used = state.questionMemory[memoryKey] || [];
+    const questions = window.HOCNHE.generate(config.subject, config.grade, config.topic, config.level, config.amount, used);
+    const keys = questions.map(q => q.prompt + "|" + q.answer);
+    state.questionMemory[memoryKey] = [...keys, ...used.filter(key => !keys.includes(key))].slice(0, 120);
+    saveState(state);
+    return questions;
+  }
+
   function renderPlanReport(plan) {
     const state = getState();
     const completed = plan.days.filter(day => day.done).length;
@@ -544,6 +560,53 @@
       <div><strong>${change === null ? "—" : (change > 0 ? "+" : "") + change + "%"}</strong><small>Thay đổi điểm</small></div>`;
     els.planComment.innerHTML = `<p><strong>Nhận xét:</strong> Em đã hoàn thành ${completed}/7 ngày; thói quen học ${habit}. ${escapeText(progress)}</p><p><strong>Điểm mạnh:</strong> ${strongest ? `${escapeText(strongest.name)} đang có kết quả tốt nhất (${strongest.score}%).` : "Chưa đủ bài đã chấm để xác định."}</p><p><strong>Đề xuất:</strong> ${escapeText(focus)}</p>`;
     els.planReport.hidden = false;
+  }
+
+  function openPlanPractice(day) {
+    planPracticeConfig = day.config;
+    activePlanDay = day.id;
+    planPracticeQuestions = generateWithMemory(day.config);
+    const subject = day.config.subject === "math" ? "Toán" : "Tiếng Việt";
+    els.planPractice.hidden = false;
+    els.planPractice.innerHTML = `
+      <header><div><small>BÀI LUYỆN NGÀY ${day.id}</small><h3>${escapeText(subject)} lớp ${day.config.grade}</h3><p>${escapeText(day.title)}</p></div><button class="text-button" data-plan-action="close" type="button">Thu gọn</button></header>
+      <ol class="plan-question-list">${planPracticeQuestions.map((q, index) => `
+        <li data-plan-question="${index}"><strong>Câu ${index + 1}. ${q.prompt}</strong>
+          ${q.type === "choice" ? `<div class="plan-choices">${q.options.map(option => `<label><input type="radio" name="plan-q-${index}" value="${escapeText(option)}"><span>${escapeText(option)}</span></label>`).join("")}</div>` : `<input class="text-answer" data-plan-input="${index}" type="text" placeholder="Điền đáp án" autocomplete="off">`}
+          <p class="feedback" hidden></p></li>`).join("")}</ol>
+      <div class="plan-practice-actions"><button class="primary" data-plan-action="grade" type="button">Chấm bài ngày ${day.id}</button><button class="ghost" data-plan-action="new" type="button">Tạo bài khác</button></div>`;
+    els.planPractice.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function gradePlanPractice() {
+    if (!planPracticeQuestions.length || !planPracticeConfig || els.planPractice.dataset.graded === "true") return;
+    let correct = 0;
+    let unanswered = 0;
+    planPracticeQuestions.forEach((q, index) => {
+      const row = els.planPractice.querySelector(`[data-plan-question="${index}"]`);
+      const selected = q.type === "choice" ? row.querySelector(`input[name="plan-q-${index}"]:checked`)?.value || "" : row.querySelector(`[data-plan-input="${index}"]`)?.value || "";
+      const ok = normalize(selected) === normalize(q.answer);
+      if (ok) correct++; else if (!selected) unanswered++;
+      row.classList.toggle("correct", ok);
+      row.classList.toggle("incorrect", !ok);
+      const feedback = row.querySelector(".feedback");
+      feedback.hidden = false;
+      feedback.textContent = ok ? `Đúng. ${q.explanation}` : `${selected ? "Chưa đúng" : "Chưa trả lời"}. Đáp án: ${q.answer}. ${q.explanation}`;
+    });
+    const state = getState();
+    const score = Math.round(correct / planPracticeQuestions.length * 100);
+    const topic = topicName(planPracticeConfig.subject, planPracticeConfig.grade, planPracticeConfig.topic);
+    state.history = [{ id: Date.now(), date: new Date().toISOString(), grade: planPracticeConfig.grade, subject: planPracticeConfig.subject, topic, correct, total: planPracticeQuestions.length, score, wrong: planPracticeQuestions.length - correct - unanswered, unanswered }, ...(state.history || [])].slice(0, 12);
+    const day = state.plan?.days?.find(item => item.id === activePlanDay);
+    if (day) day.done = true;
+    saveState(state);
+    els.planPractice.dataset.graded = "true";
+    const gradeButton = els.planPractice.querySelector('[data-plan-action="grade"]');
+    if (gradeButton) { gradeButton.disabled = true; gradeButton.textContent = "Đã chấm bài"; }
+    renderHistory();
+    renderPlan();
+    els.planPractice.hidden = false;
+    els.planPractice.insertAdjacentHTML("afterbegin", `<div class="plan-score">Kết quả ngày ${activePlanDay}: <strong>${correct}/${planPracticeQuestions.length} · ${score}%</strong></div>`);
   }
 
   function printPlanReport() {
@@ -753,7 +816,16 @@
     const button = event.target.closest("button[data-start-day]");
     if (!button) return;
     const day = getState().plan?.days?.find(item => item.id === Number(button.dataset.startDay));
-    if (day?.config) startConfiguredPractice(day.config);
+    if (day?.config) { els.planPractice.dataset.graded = "false"; openPlanPractice(day); }
+  });
+  els.planPractice.addEventListener("click", event => {
+    const action = event.target.closest("[data-plan-action]")?.dataset.planAction;
+    if (action === "close") els.planPractice.hidden = true;
+    if (action === "grade") gradePlanPractice();
+    if (action === "new") {
+      const day = getState().plan?.days?.find(item => item.id === activePlanDay);
+      if (day) { els.planPractice.dataset.graded = "false"; openPlanPractice(day); }
+    }
   });
   document.querySelectorAll("[data-tool]").forEach(button => button.addEventListener("click", () => handleToolClick(button.dataset.tool)));
   document.querySelectorAll("[data-quick]").forEach(button => button.addEventListener("click", () => runQuickAction(button.dataset.quick)));
