@@ -19,13 +19,21 @@
     planProgress: $("planProgress"), planProgressText: $("planProgressText"),
     planEncouragement: $("planEncouragement"), planProgressFill: $("planProgressFill"),
     achievementIcon: $("achievementIcon"), achievementTitle: $("achievementTitle"),
-    achievementText: $("achievementText")
+    achievementText: $("achievementText"), stemGrade: $("stemGrade"), stemCategory: $("stemCategory"),
+    stemCount: $("stemCount"), stemProjectGrid: $("stemProjectGrid"), stemDetail: $("stemDetail"),
+    stemDetailIcon: $("stemDetailIcon"), stemDetailTitle: $("stemDetailTitle"), stemDetailMeta: $("stemDetailMeta"),
+    stemMission: $("stemMission"), stemGoals: $("stemGoals"), stemMaterials: $("stemMaterials"),
+    stemSteps: $("stemSteps"), stemObserve: $("stemObserve"), stemExplain: $("stemExplain"),
+    stemQuestions: $("stemQuestions"), stemSafety: $("stemSafety"), stemPrediction: $("stemPrediction"),
+    stemResult: $("stemResult"), stemConclusion: $("stemConclusion"), stemComplete: $("stemComplete"),
+    saveStemBtn: $("saveStemBtn"), printStemBtn: $("printStemBtn"), stemSaveStatus: $("stemSaveStatus")
   };
 
   const STORE_KEY = "hocnhe-v1";
   let currentQuestions = [];
   let currentConfig = null;
   let currentResults = [];
+  let currentStemId = null;
 
   function getState() {
     try {
@@ -488,6 +496,89 @@
     });
   }
 
+  function stemCategoryName(category) {
+    return ({ science: "Khoa học", engineering: "Kĩ thuật", technology: "Công nghệ", environment: "Môi trường" })[category] || "STEM";
+  }
+
+  function stemNotes() {
+    return getState().stemNotes || {};
+  }
+
+  function renderStemProjects() {
+    if (!window.HOCNHE_STEM || !els.stemProjectGrid) return;
+    const grade = Number(els.stemGrade.value);
+    const category = els.stemCategory.value;
+    const notes = stemNotes();
+    const projects = window.HOCNHE_STEM.filter(project => project.grade === grade && (category === "all" || project.category === category));
+    els.stemCount.textContent = `${projects.length} dự án phù hợp`;
+    els.stemProjectGrid.replaceChildren(...projects.map(project => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "stem-project";
+      button.dataset.stemId = project.id;
+      const complete = notes[project.id]?.complete ? '<span class="stem-done-badge">✓ Đã hoàn thành</span>' : "";
+      button.innerHTML = `<span class="stem-project-icon" aria-hidden="true">${escapeText(project.icon)}</span><h3>${escapeText(project.title)}</h3><p>${escapeText(project.mission)}</p><footer><span>${escapeText(project.time)} · ${escapeText(project.level)}</span>${complete || "<span>Xem dự án →</span>"}</footer>`;
+      return button;
+    }));
+    if (!projects.length) {
+      const empty = document.createElement("p");
+      empty.className = "history-empty";
+      empty.textContent = "Chưa có dự án ở bộ lọc này. Hãy chọn Tất cả.";
+      els.stemProjectGrid.appendChild(empty);
+    }
+  }
+
+  function openStemProject(id, shouldScroll = true) {
+    const project = window.HOCNHE_STEM?.find(item => item.id === id);
+    if (!project) return;
+    currentStemId = id;
+    els.stemDetailIcon.textContent = project.icon;
+    els.stemDetailTitle.textContent = project.title;
+    els.stemDetailMeta.textContent = `Lớp ${project.grade} · ${stemCategoryName(project.category)} · ${project.time} · ${project.level}`;
+    els.stemMission.textContent = project.mission;
+    const fillList = (element, items) => element.replaceChildren(...items.map(item => { const li = document.createElement("li"); li.textContent = item; return li; }));
+    fillList(els.stemGoals, project.goals);
+    fillList(els.stemMaterials, project.materials);
+    fillList(els.stemSteps, project.steps);
+    fillList(els.stemQuestions, project.questions);
+    els.stemObserve.replaceChildren(...project.observe.map((item, index) => {
+      const box = document.createElement("div");
+      box.innerHTML = `<strong>Quan sát ${index + 1}</strong><span>${escapeText(item)}</span>`;
+      return box;
+    }));
+    els.stemExplain.textContent = project.explain;
+    els.stemSafety.textContent = project.safety;
+    const note = stemNotes()[id] || {};
+    els.stemPrediction.value = note.prediction || "";
+    els.stemResult.value = note.result || "";
+    els.stemConclusion.value = note.conclusion || "";
+    els.stemComplete.checked = Boolean(note.complete);
+    els.stemSaveStatus.textContent = note.savedAt ? "Đã tải nhật ký đã lưu." : "";
+    els.stemDetail.hidden = false;
+    if (shouldScroll) els.stemDetail.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function saveStemJournal() {
+    if (!currentStemId) return;
+    const state = getState();
+    state.stemNotes ||= {};
+    state.stemNotes[currentStemId] = {
+      prediction: els.stemPrediction.value.trim(), result: els.stemResult.value.trim(),
+      conclusion: els.stemConclusion.value.trim(), complete: els.stemComplete.checked,
+      savedAt: new Date().toISOString()
+    };
+    saveState(state);
+    els.stemSaveStatus.textContent = "✓ Đã lưu trên thiết bị này";
+    renderStemProjects();
+  }
+
+  function printStemProject() {
+    if (!currentStemId) return;
+    document.body.classList.add("print-stem");
+    window.print();
+    setTimeout(() => document.body.classList.remove("print-stem"), 1000);
+  }
+
   function handleToolClick(tool) {
     if (tool === "math" || tool === "vietnamese") {
       els.subject.value = tool;
@@ -507,6 +598,11 @@
     }
     if (tool === "analysis") {
       $("analysis").scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (tool === "stem") {
+      $("stem").scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => els.stemGrade.focus(), 500);
       return;
     }
     $("plan").scrollIntoView({ behavior: "smooth" });
@@ -555,6 +651,15 @@
   els.answerBtn.addEventListener("click", toggleAnswers);
   els.explainBtn.addEventListener("click", renderExplanation);
   els.createPlanBtn.addEventListener("click", buildSevenDayPlan);
+  els.stemGrade.addEventListener("change", renderStemProjects);
+  els.stemCategory.addEventListener("change", renderStemProjects);
+  els.stemProjectGrid.addEventListener("click", event => {
+    const button = event.target.closest("button[data-stem-id]");
+    if (button) openStemProject(button.dataset.stemId);
+  });
+  els.saveStemBtn.addEventListener("click", saveStemJournal);
+  els.printStemBtn.addEventListener("click", printStemProject);
+  window.addEventListener("afterprint", () => document.body.classList.remove("print-stem"));
   els.dayGrid.addEventListener("change", event => {
     const input = event.target.closest("input[data-day]");
     if (!input) return;
@@ -581,6 +686,7 @@
     else { state.history = []; saveState(state); }
     renderHistory();
     renderPlan();
+    renderStemProjects();
     if (allData) restorePreferences();
   });
 
@@ -588,4 +694,5 @@
   restorePreferences();
   renderHistory();
   renderPlan();
+  renderStemProjects();
 })();
